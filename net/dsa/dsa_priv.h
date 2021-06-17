@@ -161,7 +161,8 @@ extern const struct dsa_device_ops dsa_netdev_ops;
 extern const struct dsa_device_ops edsa_netdev_ops;
 
 /* tag_ksz.c */
-extern const struct dsa_device_ops ksz_netdev_ops;
+extern const struct dsa_device_ops ksz9477_netdev_ops;
+extern const struct dsa_device_ops ksz9893_netdev_ops;
 
 /* tag_lan9303.c */
 extern const struct dsa_device_ops lan9303_netdev_ops;
@@ -183,6 +184,29 @@ static inline struct net_device *dsa_master_netdev(struct dsa_slave_priv *p)
 static inline struct dsa_port *dsa_get_cpu_port(struct dsa_switch_tree *dst)
 {
 	return dst->cpu_dp;
+}
+
+static inline struct dsa_port *dsa_slave_to_port(const struct net_device *dev)
+{
+    struct dsa_slave_priv *p = netdev_priv(dev);
+
+    return p->dp;
+}
+
+static inline struct net_device *dsa_master_find_slave(struct net_device *dev,
+							   int device, int port)
+{
+	struct dsa_switch_tree *dst = dev->dsa_ptr;
+	struct dsa_port *cpu_dp = dsa_get_cpu_port(dst);
+	struct dsa_switch *ds =  cpu_dp->ds;
+	struct dsa_port *dp;
+
+	u32 index;
+	for (index = 0; index < ds->num_ports; index++)
+		if (ds->ports[index].ds->index == device && index == port)
+			  return ds->ports[index].netdev;
+
+	return NULL;
 }
 
 #endif

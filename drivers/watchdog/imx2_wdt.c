@@ -149,14 +149,14 @@ static inline void imx2_wdt_setup(struct watchdog_device *wdog)
 	else
 		val |= IMX2_WDT_WCR_WRE;
 	/* Keep Watchdog Disabled */
-	val &= ~IMX2_WDT_WCR_WDE;
+	/* val &= ~IMX2_WDT_WCR_WDE; */
 	/* Set the watchdog's Time-Out value */
 	val |= WDOG_SEC_TO_COUNT(wdog->timeout);
 
 	regmap_write(wdev->regmap, IMX2_WDT_WCR, val);
 
 	/* enable the watchdog */
-	val |= IMX2_WDT_WCR_WDE;
+	/* val |= IMX2_WDT_WCR_WDE; */
 	regmap_write(wdev->regmap, IMX2_WDT_WCR, val);
 }
 

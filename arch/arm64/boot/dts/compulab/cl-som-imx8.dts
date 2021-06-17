@@ -1,0 +1,503 @@
+/*
+ * Copyright (C) 2017 CopuLab Ltd.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+
+#include "compulab-imx8mq.dtsi"
+
+/ {
+	model = "CompuLab CL-SOM-iMX8 rev1.1";
+	compatible = "compulab,cl-som-imx8,rev1.1", "compulab,cl-som-imx8", "fsl,imx8mq";
+
+	bcmdhd_wlan_0: bcmdhd_wlan@0 {
+		compatible = "android,bcmdhd_wlan";
+		bcmdhd_fw = "/lib/firmware/bcm/1CX_BCM4356/fw_bcmdhd.bin";
+		bcmdhd_nv = "/lib/firmware/bcm/1CX_BCM4356/bcmdhd.cal";
+	};
+
+	regulators {
+		reg_usb_mux: usb_mux {
+			compatible = "regulator-fixed";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_usbimux1>;
+			regulator-name = "usb_mux";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			gpio = <&gpio1 4 GPIO_ACTIVE_HIGH>;
+			regulator-always-on;
+		};
+	};
+};
+
+&iomuxc {
+	cl-som-imx8 {
+		pinctrl_usbimux1: usbmux1grp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_GPIO1_IO04_GPIO1_IO4	0x16
+			>;
+		};
+		pinctrl_pcie1: pcie1grp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_SAI3_RXC_GPIO4_IO29 	0x16 /* WIFI reset-gpio   */
+				MX8MQ_IOMUXC_GPIO1_IO01_GPIO1_IO1	0x16 /* WIFI disable-gpio */
+
+				MX8MQ_IOMUXC_GPIO1_IO03_GPIO1_IO3	0x16 /* WIFI pewake */
+				MX8MQ_IOMUXC_GPIO1_IO00_ANAMIX_REF_CLK_32K 0x16
+			>;
+		};
+		pinctrl_i2c4_gt911: i2c4-gt911grp {
+			fsl,pins = <
+				#define GPIRQ_GT911		<&gpio4 26 IRQ_TYPE_LEVEL_HIGH>
+				#define GP_GT911_IRQ		<&gpio4 26 GPIO_ACTIVE_HIGH>
+				#define GP_GT911_RESET          <&gpio4 24 GPIO_ACTIVE_LOW>
+				MX8MQ_IOMUXC_SAI2_TXD0_GPIO4_IO26	0x1D6
+				MX8MQ_IOMUXC_SAI2_TXFS_GPIO4_IO24	0x176
+			>;
+		};
+	};
+};
+
+&pcie0 {
+	status = "okay";
+};
+
+&pcie1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pcie1>;
+	reset-gpio = <&gpio4 29 GPIO_ACTIVE_LOW>;
+	disable-gpio = <&gpio1 1 GPIO_ACTIVE_LOW>;
+	ext_osc = <0>;
+	hard-wired = <1>;
+	status = "okay";
+};
+
+&wm8731 {
+    status = "okay";
+};
+
+&pwm4 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_pwm4>;
+    status = "okay";
+};
+
+&pwm3 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_pwm3>;
+    status = "disabled";
+};
+
+&pwm2 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_pwm2>;
+    status = "okay";
+};
+
+&pwm1 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_pwm1>;
+    status = "okay";
+};
+
+&i2c4 {
+    clock-frequency = <400000>;
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_i2c4>;
+    status = "okay";
+
+    pca9956b@0x1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	reg = <0x01>;
+
+	compatible    = "nxp,pca9956b";
+
+	pca9956b,support_initialize = <1>;
+	pca9956b,mode1 = <0x09>;
+	pca9956b,mode2 = <0x05>;
+
+	pca9956b,defaultiref = <0x2f>;
+
+	out0@0 {
+	    label = "led1_r";
+	    reg = <0x0>;
+	};
+
+	out1@1 {
+	    label = "led1_g";
+	    reg = <0x1>;
+	};
+
+	out2@2 {
+	    label = "led1_b";
+	    reg = <0x2>;
+	};
+
+	out3@3 {
+	    label = "led2_r";
+	    reg = <0x3>;
+	};
+
+	out4@4 {
+	    label = "led2_g";
+	    reg = <0x4>;
+	};
+
+	out5@5 {
+	    label = "led2_b";
+	    reg = <0x5>;
+	};
+
+	out6@6 {
+	    label = "led3_r";
+	    reg = <0x6>;
+	};
+
+	out7@7 {
+	    label = "led3_g";
+	    reg = <0x7>;
+	};
+
+	out8@8 {
+	    label = "led3_b";
+	    reg = <0x8>;
+	};
+
+	out9@9 {
+	    label = "led4_r";
+	    reg = <0x9>;
+	};
+
+	outa@a {
+	    label = "led4_g";
+	    reg = <0xa>;
+	};
+
+	outb@b {
+	    label = "led4_b";
+	    reg = <0xb>;
+	};
+
+	outc@c {
+	    label = "led5_r";
+	    reg = <0xc>;
+	};
+
+	outd@d {
+	    label = "led5_g";
+	    reg = <0xd>;
+	};
+
+	oute@e {
+	    label = "led5_b";
+	    reg = <0xe>;
+	};
+
+	outf@f {
+	    label = "led6_r";
+	    reg = <0xf>;
+	};
+
+	out10@10 {
+	    label = "led6_g";
+	    reg = <0x10>;
+	};
+
+	out11@11 {
+	    label = "led6_b";
+	    reg = <0x11>;
+	};
+
+	out12@12 {
+	    label = "led7_r";
+	    reg = <0x12>;
+	};
+
+	out13@13 {
+	    label = "led7_g";
+	    reg = <0x13>;
+	};
+
+	out14@14 {
+	    label = "led7_b";
+	    reg = <0x14>;
+	};
+
+	out15@15 {
+	    label = "led8_r";
+	    reg = <0x15>;
+	};
+
+	out16@16 {
+	    label = "led8_g";
+	    reg = <0x16>;
+	};
+
+	out17@17 {
+	    label = "led8_b";
+	    reg = <0x17>;
+	};
+    };
+
+    pca9956b@0x5 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	reg = <0x05>;
+
+	compatible    = "nxp,pca9956b";
+
+	pca9956b,support_initialize = <1>;
+	pca9956b,mode1 = <0x09>;
+	pca9956b,mode2 = <0x05>;
+
+	pca9956b,defaultiref = <0x2f>;
+
+	out0@0 {
+	    label = "led9_r";
+	    reg = <0x0>;
+	};
+
+	out1@1 {
+	    label = "led9_g";
+	    reg = <0x1>;
+	};
+
+	out2@2 {
+	    label = "led9_b";
+	    reg = <0x2>;
+	};
+
+	out3@3 {
+	    label = "led10_r";
+	    reg = <0x3>;
+	};
+
+	out4@4 {
+	    label = "led10_g";
+	    reg = <0x4>;
+	};
+
+	out5@5 {
+	    label = "led10_b";
+	    reg = <0x5>;
+	};
+
+	out6@6 {
+	    label = "led11_r";
+	    reg = <0x6>;
+	};
+
+	out7@7 {
+	    label = "led11_g";
+	    reg = <0x7>;
+	};
+
+	out8@8 {
+	    label = "led11_b";
+	    reg = <0x8>;
+	};
+
+	out9@9 {
+	    label = "led12_r";
+	    reg = <0x9>;
+	};
+
+	outa@a {
+	    label = "led12_g";
+	    reg = <0xa>;
+	};
+
+	outb@b {
+	    label = "led12_b";
+	    reg = <0xb>;
+	};
+
+	outc@c {
+	    label = "led13_r";
+	    reg = <0xc>;
+	};
+
+	outd@d {
+	    label = "led13_g";
+	    reg = <0xd>;
+	};
+
+	oute@e {
+	    label = "led13_b";
+	    reg = <0xe>;
+	};
+
+	outf@f {
+	    label = "led14_r";
+	    reg = <0xf>;
+	};
+
+	out10@10 {
+	    label = "led14_g";
+	    reg = <0x10>;
+	};
+
+	out11@11 {
+	    label = "led14_b";
+	    reg = <0x11>;
+	};
+
+	out12@12 {
+	    label = "led15_r";
+	    reg = <0x12>;
+	};
+
+	out13@13 {
+	    label = "led15_g";
+	    reg = <0x13>;
+	};
+
+	out14@14 {
+	    label = "led15_b";
+	    reg = <0x14>;
+	};
+
+	out15@15 {
+	    label = "led16_r";
+	    reg = <0x15>;
+	};
+
+	out16@16 {
+	    label = "led16_g";
+	    reg = <0x16>;
+	};
+
+	out17@17 {
+	    label = "led16_b";
+	    reg = <0x17>;
+	};
+    };
+
+    switch@5f {
+                  #address-cells = <1>;
+                  #size-cells = <0>;
+                  compatible = "microchip,ksz9893"; /* ksz9893 */
+		          reset-gpios = <&gpio3 17 GPIO_ACTIVE_LOW>;
+                  reg = <0x5f>;
+
+                  status = "okay";
+
+                  ports {
+                             #address-cells = <1>;
+                             #size-cells = <0>;
+
+                             port@0 {
+                                          reg = <0>;
+                                          label = "lan1";
+                             };
+
+                             port@1 {
+                                          reg = <1>;
+                                          label = "lan2";
+                             };
+
+			                 port2switch: port@2 {
+                                          reg = <2>;
+                                          label = "cpu";
+                                          ethernet = <&fec1>;
+                                          fixed-link {
+                                                      speed = <1000>;
+                                                      full-duplex;
+                                          };
+                            };
+                   };
+         };
+
+
+	goodix_ts@5d {
+		compatible = "goodix,gt911";
+		reg = <0x5d>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_i2c4_gt911>;
+		touchscreen-inverted-x = "true";
+		touchscreen-inverted-y = "true";
+
+		esd-recovery-timeout-ms = <2000>;
+		interrupts-extended = GPIRQ_GT911;
+		irq-gpios = GP_GT911_IRQ;
+		reset-gpios = GP_GT911_RESET;
+		status = "okay";
+	};
+
+};
+
+&irqsteer_dcss {
+    status = "disabled";
+};
+
+&dcss {
+    status = "disabled";
+};
+
+&hdmi {
+    status = "disabled";
+};
+
+&lcdif {
+    status = "okay";
+    /*max-res = <1080>, <1920>;*/
+
+    port@0 {
+	lcdif_mipi_dsi_maxen: endpoint {
+	    remote-endpoint = <&mipi_dsi_in>;
+	};
+    };
+};
+
+&mipi_dsi_phy {
+    status = "okay";
+};
+
+&mipi_dsi {
+    status = "okay";
+    as_bridge;
+    sync-pol = <1>;
+    pwr-delay = <10>;
+    port@1 {
+	mipi_dsi_in: endpoint {
+	    remote-endpoint = <&lcdif_mipi_dsi_maxen>;
+	};
+    };
+};
+
+&mipi_dsi_bridge {
+    status = "okay";
+
+    panel@0 {
+	compatible = "raydium,rm67191";
+	reg = <0>;
+/*  	pinctrl-0 = <&pinctrl_mipi_dsi_en>;
+	reset-gpio = <&gpio5 6 GPIO_ACTIVE_HIGH>;*/
+	dsi-lanes = <4>;
+	panel-width-mm = <154>;
+	panel-height-mm = <88>;
+	port {
+	    panel1_in: endpoint {
+		remote-endpoint = <&mipi_dsi_bridge_out>;
+	    };
+	};
+    };
+
+    port@1 {
+	mipi_dsi_bridge_out: endpoint {
+	    remote-endpoint = <&panel1_in>;
+	};
+    };
+};
