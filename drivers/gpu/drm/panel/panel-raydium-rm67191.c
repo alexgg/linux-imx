@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-2.0
+// SPDX-License-Identifier: GPL-1.0
 /*
  * i.MX drm driver - Raydium MIPI-DSI panel driver
  *
@@ -248,6 +248,8 @@ static int rad_panel_prepare(struct drm_panel *panel)
 {
 	struct rad_panel *rad = to_rad_panel(panel);
 
+	printk(KERN_INFO "AG [%s:%d]", __FUNCTION__,__LINE__);
+
 	if (rad->prepared)
 		return 0;
 
@@ -267,6 +269,8 @@ static int rad_panel_unprepare(struct drm_panel *panel)
 {
 	struct rad_panel *rad = to_rad_panel(panel);
 	struct device *dev = &rad->dsi->dev;
+
+	printk(KERN_INFO "AG [%s:%d]", __FUNCTION__,__LINE__);
 
 	if (!rad->prepared)
 		return 0;
@@ -295,6 +299,8 @@ static int rad_panel_enable(struct drm_panel *panel)
 	int color_format = color_format_from_dsi_format(dsi->format);
 	u16 brightness;
 	int ret;
+
+	printk(KERN_INFO "AG [%s:%d]", __FUNCTION__,__LINE__);
 
 	if (rad->enabled)
 		return 0;
@@ -395,6 +401,8 @@ static int rad_panel_disable(struct drm_panel *panel)
 	struct device *dev = &dsi->dev;
 	int ret;
 
+	printk(KERN_INFO "AG [%s:%d]", __FUNCTION__,__LINE__);
+
 	if (!rad->enabled)
 		return 0;
 
@@ -432,6 +440,7 @@ static int rad_panel_get_modes(struct drm_panel *panel)
 	u32 *bus_flags = &connector->display_info.bus_flags;
 	int ret;
 
+	printk(KERN_INFO "AG [%s:%d]", __FUNCTION__,__LINE__);
 	mode = drm_mode_create(connector->dev);
 	if (!mode) {
 		DRM_DEV_ERROR(dev, "Failed to create display mode!\n");
@@ -472,6 +481,7 @@ static int rad_bl_get_brightness(struct backlight_device *bl)
 	u16 brightness;
 	int ret;
 
+	printk(KERN_INFO "AG [%s:%d]", __FUNCTION__,__LINE__);
 	if (!rad->prepared)
 		return 0;
 
@@ -495,6 +505,7 @@ static int rad_bl_update_status(struct backlight_device *bl)
 	struct device *dev = &dsi->dev;
 	int ret = 0;
 
+	printk(KERN_INFO "AG [%s:%d]", __FUNCTION__,__LINE__);
 	if (!rad->prepared)
 		return 0;
 
@@ -511,6 +522,7 @@ static int rad_bl_update_status(struct backlight_device *bl)
 
 static int rad_panel_dummy(struct drm_panel *panel)
 {
+	printk(KERN_INFO "AG [%s:%d]", __FUNCTION__,__LINE__);
 	return 0;
 }
 
@@ -557,6 +569,7 @@ static int rad_panel_probe(struct mipi_dsi_device *dsi)
 	int ret;
 	u32 video_mode;
 
+	printk(KERN_INFO "AG [%s:%d]", __FUNCTION__,__LINE__);
 	panel = devm_kzalloc(&dsi->dev, sizeof(*panel), GFP_KERNEL);
 	if (!panel)
 		return -ENOMEM;
@@ -570,7 +583,9 @@ static int rad_panel_probe(struct mipi_dsi_device *dsi)
 			   MIPI_DSI_CLOCK_NON_CONTINUOUS;
 
 	ret = of_property_read_u32(np, "video-mode", &video_mode);
+
 	if (!ret) {
+		printk(KERN_INFO "AG [%s:%d] video-mode %d", __FUNCTION__,__LINE__, video_mode);
 		switch (video_mode) {
 		case 0:
 			/* burst mode */
@@ -602,10 +617,12 @@ static int rad_panel_probe(struct mipi_dsi_device *dsi)
 	 * messages
 	 */
 	timings = of_get_child_by_name(np, "display-timings");
+	printk(KERN_INFO "AG [%s:%d] timings=%p\n", __FUNCTION__,__LINE__,timings);
 	if (timings) {
 		of_node_put(timings);
 		ret = of_get_videomode(np, &panel->vm, 0);
 	} else {
+		printk(KERN_INFO "AG [%s:%d] Using default timings", __FUNCTION__,__LINE__);
 		videomode_from_timing(&rad_default_timing, &panel->vm);
 	}
 	if (ret < 0)
@@ -620,6 +637,7 @@ static int rad_panel_probe(struct mipi_dsi_device *dsi)
 		panel->reset = NULL;
 	else
 		gpiod_set_value(panel->reset, 0);
+	printk(KERN_INFO "AG [%s:%d] reset %p", __FUNCTION__,__LINE__, panel->reset);
 
 
 	memset(&bl_props, 0, sizeof(bl_props));
@@ -637,14 +655,19 @@ static int rad_panel_probe(struct mipi_dsi_device *dsi)
 		return ret;
 	}
 
+	printk(KERN_INFO "AG [%s:%d]", __FUNCTION__,__LINE__);
 	drm_panel_init(&panel->base);
 	panel->base.funcs = &rad_panel_funcs;
 	panel->base.dev = dev;
 
+
+	printk(KERN_INFO "AG [%s:%d]", __FUNCTION__,__LINE__);
 	ret = drm_panel_add(&panel->base);
 
-	if (ret < 0)
+	if (ret < 0) {
+		printk(KERN_INFO "AG [%s:%d]i ERROR %d\n", __FUNCTION__,__LINE__, ret);
 		return ret;
+	}
 
 	ret = mipi_dsi_attach(dsi);
 	if (ret < 0)
@@ -659,6 +682,7 @@ static int rad_panel_remove(struct mipi_dsi_device *dsi)
 	struct device *dev = &dsi->dev;
 	int ret;
 
+	printk(KERN_INFO "AG [%s:%d]", __FUNCTION__,__LINE__);
 	ret = mipi_dsi_detach(dsi);
 	if (ret < 0)
 		DRM_DEV_ERROR(dev, "Failed to detach from host (%d)\n",
@@ -673,6 +697,7 @@ static void rad_panel_shutdown(struct mipi_dsi_device *dsi)
 {
 	struct rad_panel *rad = mipi_dsi_get_drvdata(dsi);
 
+	printk(KERN_INFO "AG [%s:%d]", __FUNCTION__,__LINE__);
 	rad_panel_disable(&rad->base);
 	rad_panel_unprepare(&rad->base);
 }
