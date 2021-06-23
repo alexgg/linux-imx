@@ -28,6 +28,7 @@ CONFIG_NAMESPACES=y
 CONFIG_USER_NS=y
 CONFIG_SCHED_AUTOGROUP=y
 CONFIG_BLK_DEV_INITRD=y
+CONFIG_INITRAMFS_SOURCE="/build/balena-compulab/build/tmp/deploy/images/etcher-pro/balena-image-initramfs-etcher-pro-20210617085011.rootfs.cpio.gz"
 CONFIG_EXPERT=y
 CONFIG_PROFILING=y
 CONFIG_JUMP_LABEL=y
