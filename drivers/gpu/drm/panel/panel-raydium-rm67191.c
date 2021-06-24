@@ -520,7 +520,26 @@ static int rad_bl_update_status(struct backlight_device *bl)
 	return 0;
 }
 
-static int rad_panel_dummy(struct drm_panel *panel)
+static int rad_panel_dummy_prepare(struct drm_panel *panel)
+{
+	printk(KERN_INFO "AG [%s:%d]", __FUNCTION__,__LINE__);
+	return 0;
+}
+
+
+static int rad_panel_dummy_unprepare(struct drm_panel *panel)
+{
+	printk(KERN_INFO "AG [%s:%d]", __FUNCTION__,__LINE__);
+	return 0;
+}
+
+static int rad_panel_dummy_enable(struct drm_panel *panel)
+{
+	printk(KERN_INFO "AG [%s:%d]", __FUNCTION__,__LINE__);
+	return 0;
+}
+
+static int rad_panel_dummy_disable(struct drm_panel *panel)
 {
 	printk(KERN_INFO "AG [%s:%d]", __FUNCTION__,__LINE__);
 	return 0;
@@ -532,10 +551,10 @@ static const struct backlight_ops rad_bl_ops = {
 };
 
 static const struct drm_panel_funcs rad_panel_funcs = {
-	.prepare = rad_panel_dummy,
-	.unprepare = rad_panel_dummy,
-	.enable = rad_panel_dummy,
-	.disable = rad_panel_dummy,
+	.prepare = rad_panel_dummy_prepare,
+	.unprepare = rad_panel_dummy_unprepare,
+	.enable = rad_panel_dummy_enable,
+	.disable = rad_panel_dummy_disable,
 	.get_modes = rad_panel_get_modes,
 };
 
@@ -569,7 +588,7 @@ static int rad_panel_probe(struct mipi_dsi_device *dsi)
 	int ret;
 	u32 video_mode;
 
-	printk(KERN_INFO "AG [%s:%d]", __FUNCTION__,__LINE__);
+	printk(KERN_INFO "AG [%s:%d] version deb1.0", __FUNCTION__,__LINE__);
 	panel = devm_kzalloc(&dsi->dev, sizeof(*panel), GFP_KERNEL);
 	if (!panel)
 		return -ENOMEM;
