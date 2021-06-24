@@ -570,7 +570,7 @@ static const struct display_timing rad_default_timing = {
 	.hback_porch = { 10, 10, 10 },
 	.vactive = { 600, 600, 600 },
 	.vfront_porch = { 10, 10, 10 },
-	.vsync_len = { 10, 10, 10 },
+	.vsync_len = { 4, 4, 4 },
 	.vback_porch = { 15, 15, 15 },
 	.flags = DISPLAY_FLAGS_HSYNC_LOW |
 		 DISPLAY_FLAGS_VSYNC_LOW |
@@ -588,7 +588,7 @@ static int rad_panel_probe(struct mipi_dsi_device *dsi)
 	int ret;
 	u32 video_mode;
 
-	printk(KERN_INFO "AG [%s:%d] version deb1.0", __FUNCTION__,__LINE__);
+	printk(KERN_INFO "AG [%s:%d] version deb1.1", __FUNCTION__,__LINE__);
 	panel = devm_kzalloc(&dsi->dev, sizeof(*panel), GFP_KERNEL);
 	if (!panel)
 		return -ENOMEM;
